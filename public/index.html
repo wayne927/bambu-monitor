@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>Printers Dashboard</title>
+<style>
+
+body{
+    margin:0;
+    padding:20px;
+    font-family:Arial;
+    background:#223;
+    color: #BBB;
+}
+
+.grid{
+
+}
+
+.card{
+    float: left;
+    background:#445;
+    border-radius:10px;
+    padding:0px 10px 10px 10px;
+    box-shadow:
+        0 2px 10px rgba(0,0,0,.1);
+    width: 200px;
+    margin: 0px 20px 20px 0;
+}
+
+.card h2 {
+    margin-top: 10px;
+}
+
+.status{
+    margin-bottom:12px;
+}
+
+.online{
+    color:green;
+}
+
+.offline{
+    color:red;
+}
+
+.error{
+    font-weight: bold;
+    color: red;
+}
+
+pre{
+    background:#f4f4f4;
+    padding:12px;
+    overflow:auto;
+    max-height:250px;
+}
+
+.progress{
+    position: relative;
+    width:100%;
+    height:20px;
+    background:#666;
+    border-radius:10px;
+    overflow:hidden;
+    margin: 5px 0 5px 0;
+    text-align: center;
+}
+
+.bar{
+    position: absolute;
+    top: 0;
+    height:100%;
+    width:0%;
+    background:#77D;
+    z-index: 1;
+}
+
+.progress .text {
+    position: relative;
+    z-index: 2;
+    color: white;
+    font-weight: bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="grid" class="grid"></div>
+
+<script>
+
+const grid =
+    document.getElementById("grid");
+
+const ws =
+    new WebSocket(
+        `ws://${location.host}`
+    );
+
+
+function render(printers){
+
+    grid.innerHTML = "";
+
+    Object.entries(printers)
+        .forEach(([id,data])=>{
+
+        const percent =
+            data.mc_percent || 0;
+
+        const card =
+            document.createElement("div");
+
+        status_class = ""
+        if (data.print_error != 0) {
+            status_class = "error"
+        }
+
+        hr_remaining = Math.floor(data.mc_remaining_time / 60)
+        min_remaining = data.mc_remaining_time % 60
+        time_remaining = hr_remaining + " hr " + min_remaining + " min"
+
+        card.className = "card";
+
+        card.innerHTML = `
+
+        <h2>${data.name} &nbsp;&nbsp; (${data.connected ? "online" : "offline"})</h2>
+
+        <div>
+            Nozzle: ${data.nozzle_temper || "-"} °C
+        </div>
+
+        <div>
+            Bed: ${data.bed_temper || "-"} °C
+        </div>
+
+        <br>
+
+        <div>
+            Project file: ${data.gcode_file || "-"}
+        </div>
+
+        <div class="progress">
+            <div class="bar" style="width:${percent}%">
+            </div>
+            <div class="text">${percent}%</div>
+        </div>
+
+        <div>
+            Layer: ${data.layer_num || "-"} / ${data.total_layer_num || "-"}
+        </div>
+        
+        <div>
+            ${time_remaining} remaining
+        </div>
+
+        <div>
+            <span class="${status_class}">Gcode state: ${data.gcode_state}
+            ${status_class ? "ERROR" : ""}
+        </div>
+
+        `;
+
+        grid.appendChild(card);
+
+    });
+}
+
+ws.onmessage = e => {
+    const printers =
+        JSON.parse(e.data);
+
+    render(printers);
+};
+
+</script>
+
+</body>
+
+</html>
