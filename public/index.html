@@ -125,7 +125,12 @@ function render(printers){
 
         hr_remaining = Math.floor(data.mc_remaining_time / 60)
         min_remaining = data.mc_remaining_time % 60
-        time_remaining = hr_remaining + " hr " + min_remaining + " min"
+
+        time_remaining = ""
+        if (hr_remaining > 0) {
+            time_remaining = hr_remaining + " hr "
+        }
+        time_remaining = time_remaining + min_remaining + " min"
 
         card.className = "card";
 
