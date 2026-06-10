@@ -9,23 +9,7 @@ const wss = new WebSocket.Server({ server });
 
 app.use(express.static("public"));
 
-const printers = [
-    {
-        id: "printer1",
-        name: "<name>",
-        ip: "<IP>",
-        serial: "<serial>",
-        accessCode: "<access code>"
-    },
-
-    {
-        id: "printer2",
-        name: "<name>",
-        ip: "<IP>",
-        serial: "<serial>",
-        accessCode: "<access code>"
-    }
-];
+const printers = require('../config/config.local.json');
 
 const printerState = {};
 

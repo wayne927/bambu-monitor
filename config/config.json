@@ -1,0 +1,16 @@
+[
+  {
+    "id": "printer1",
+    "name": "<name>",
+    "ip": "<IP>",
+    "serial": "<serial>",
+    "accessCode": "<access code>"
+  },
+  {
+    "id": "printer2",
+    "name": "<name>",
+    "ip": "<IP>",
+    "serial": "<serial>",
+    "accessCode": "<access code>"
+  }
+]
