@@ -20,7 +20,7 @@ body{
 
 .card{
     float: left;
-    background:#445;
+    background:#334;
     border-radius:10px;
     padding:0px 10px 10px 10px;
     box-shadow:
@@ -84,6 +84,13 @@ pre{
     font-weight: bold;
 }
 
+.temp_on{
+    font-weight: bold;
+    color: white;
+}
+
+
+
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -132,6 +139,19 @@ function render(printers){
         }
         time_remaining = time_remaining + min_remaining + " min"
 
+        nozzle_temp_class = ""
+        if (data.nozzle_temper > 60) {
+            nozzle_temp_class = "temp_on"
+            card.style.background = "#557"
+            card.style.border = "2px solid white"
+            card.style.color = "#EEE"
+        }
+
+        bed_temp_class = ""
+        if (data.bed_temper > 40) {
+            bed_temp_class = "temp_on"
+        }
+
         card.className = "card";
 
         card.innerHTML = `
@@ -139,11 +159,11 @@ function render(printers){
         <h2>${data.name} &nbsp;&nbsp; (${data.connected ? "online" : "offline"})</h2>
 
         <div>
-            Nozzle: ${data.nozzle_temper || "-"} °C
+            <span class=${nozzle_temp_class}>Nozzle: ${data.nozzle_temper || "-"} °C</span>
         </div>
 
         <div>
-            Bed: ${data.bed_temper || "-"} °C
+            <span class=${bed_temp_class}>Bed: ${data.bed_temper || "-"} °C</span>
         </div>
 
         <br>
