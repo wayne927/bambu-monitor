@@ -4,6 +4,12 @@
   "description": "Web interface for monitoring Bambu Lab printers",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently \"npm run dev:client -- --host\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "nodemon src/server.js",
+    "build": "vite build",
+    "start": "node src/server.js",
+    "deploy": "npm run build && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,6 +27,14 @@
   "dependencies": {
     "express": "^5.2.1",
     "mqtt": "^5.15.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "nodemon": "^3.1.14",
+    "vite": "^8.3.1"
   }
 }

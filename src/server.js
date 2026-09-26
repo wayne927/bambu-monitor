@@ -1,3 +1,5 @@
+const path = require('path');
+
 const mqtt = require("mqtt");
 const express = require("express");
 const http = require("http");
@@ -7,7 +9,8 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-app.use(express.static("public"));
+const CLIENT_DIST = path.join(__dirname, "../public");
+app.use(express.static(CLIENT_DIST));
 
 const printers = require('../config/config.local.json');
 
@@ -27,6 +30,7 @@ function connectPrinter(printer) {
 
     printerState[printer.id] = {
         name: printer.name,
+        ip: printer.ip,
         connected: false,
         nozzle_temper: 0,
         bed_temper: 0,
@@ -56,7 +60,6 @@ function connectPrinter(printer) {
     });
 
     client.on("connect", () => {
-
         console.log(
             `[${printer.name}] connected`
         );
@@ -82,9 +85,7 @@ function connectPrinter(printer) {
     });
 
     client.on("message", (topic, payload) => {
-
         try {
-
             const data =
                 JSON.parse(payload.toString());
             
@@ -100,6 +101,8 @@ function connectPrinter(printer) {
 
                 new_val = val
 
+                /* If temperatures are only different to two decimal places,
+                   then don't bother with the update */
                 if (key == "nozzle_temper" || key == "bed_temper") {
                     new_val = Math.round(val * 10) / 10.0;
 
@@ -117,7 +120,6 @@ function connectPrinter(printer) {
             }
 
         } catch (err) {
-
             console.log(
                 `[${printer.name}] parse error`,
                 err
@@ -126,18 +128,14 @@ function connectPrinter(printer) {
     });
 
     client.on("close", () => {
-
         printerState[printer.id].connected = false;
-
         broadcast();
-
         console.log(
             `[${printer.name}] disconnected`
         );
     });
 
     client.on("error", err => {
-
         console.log(
             `[${printer.name}]`,
             err.message
@@ -148,15 +146,9 @@ function connectPrinter(printer) {
 printers.forEach(connectPrinter);
 
 wss.on("connection", ws => {
-
-    ws.send(
-        JSON.stringify(printerState)
-    );
+    ws.send(JSON.stringify(printerState));
 });
 
 server.listen(3000, () => {
-
-    console.log(
-        "Dashboard: http://localhost:3000"
-    );
+    console.log("Dashboard: http://localhost:3000");
 });
